@@ -1,7 +1,7 @@
 ---
 title: "Lab 12 - Smoking during pregnancy"
-author: "Insert your name here"
-date: "Insert date here"
+author: "Yiwei Tang"
+date: "2/19/2026"
 output: github_document
 ---
 
@@ -11,14 +11,83 @@ output: github_document
 library(tidyverse) 
 library(tidymodels)
 library(openintro)
+data(ncbirths)
 ```
 
 ### Exercise 1
 
-Remove this text, and add your answer for Exercise 1 here.
-Add code chunks as needed.
-Don't forget to label your code chunk.
-Do not use spaces in code chunk labels.
+fage, mage, weeks, visits, gained, and weight are numerical variables. fage, mage, visits, and gained are skewed to the right with some outliers. weeks and weight are skewed to the left with outliers.
+
+```{r summary}
+summary(ncbirths)
+```
+
+```{r fage}
+ncbirths %>% 
+  ggplot(
+    aes(
+      x = fage,
+    )
+  ) +
+  geom_boxplot() +
+  theme_minimal()
+```
+
+```{r mage}
+ncbirths %>% 
+  ggplot(
+    aes(
+      x = mage,
+    )
+  ) +
+  geom_boxplot() +
+  theme_minimal()
+```
+
+```{r weeks}
+ncbirths %>% 
+  ggplot(
+    aes(
+      x = weeks,
+    )
+  ) +
+  geom_boxplot() +
+  theme_minimal()
+```
+
+
+```{r visits}
+ncbirths %>% 
+  ggplot(
+    aes(
+      x = visits,
+    )
+  ) +
+  geom_boxplot() +
+  theme_minimal()
+```
+
+```{r gained}
+ncbirths %>% 
+  ggplot(
+    aes(
+      x = gained,
+    )
+  ) +
+  geom_boxplot() +
+  theme_minimal()
+```
+
+```{r weight}
+ncbirths %>% 
+  ggplot(
+    aes(
+      x = weight,
+    )
+  ) +
+  geom_boxplot() +
+  theme_minimal()
+```
 
 ### Exercise 2
 
