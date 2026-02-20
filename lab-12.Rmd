@@ -93,7 +93,7 @@ ncbirths %>%
 
 The mean weights of infants of White mothers in the sample is 7.25 pound, which is less than the average.
 
-```{r}
+```{r white_df}
 ncbirths_white <- ncbirths %>% 
   filter(whitemom == "white")
 
@@ -101,4 +101,80 @@ mean(ncbirths_white$weight)
 ```
 
 ### Exercise 3
+
+The observations in the sample are independent of each other and the sample size is reasonably large (n = 1000), and the shape of the distribution. However, the shape of the distribution is slightly skewed to the left. Therefore, I don't think the criteria necessary for conducting simulaiton-based inference are satisfied.
+
+```{r distribution}
+ncbirths_white %>% 
+  ggplot(
+    aes(x = weight)
+  ) +
+  geom_bar()
+```
+
+### Exercise 4
+
+```{r bootstrap}
+set.seed(123)
+
+boot.data <- ncbirths_white %>%
+  specify(response = weight) %>% 
+  generate(reps = 15000, type = "bootstrap") %>% 
+  calculate(stat = "mean")
+
+obs_mean <- mean(ncbirths_white$weight)
+
+boot_mean_center <- mean(boot.data$stat)
+
+null_dist <- boot.data %>%
+  mutate(null_stat = stat - boot_mean_center + 7.43)
+
+null_dist %>% 
+  ggplot(
+    aes(
+      x = null_stat)
+    ) +
+  geom_histogram(fill = "#9ecae1") +
+  labs(title = "Bootstrap distribution of means",
+       x = "Mean",
+       y = "") +
+  geom_vline(aes(
+    xintercept = obs_mean
+  ),
+    color = "#3182bd",
+    linetype = "dashed")
+```
+
+```{r p-value}
+p_value <- null_dist %>%
+  summarise(p = mean(abs(null_stat - 7.43) >= 
+                     abs(obs_mean - 7.43))) %>%
+  pull(p)
+
+p_value
+```
+
+The p-value is less than 0.001, which supports the alternative hypothesis that the baby weight in the sample is significantly lower than that of the population.
+
+### Exercise 5
+
+```{r habit_weight}
+ncbirths %>%
+  filter(!is.na(habit),
+         !is.na(weight)) %>%
+  ggplot(aes(
+    x = habit, 
+    y = weight)) +
+  geom_boxplot(fill = "#9ecae1",
+               alpha = 0.8,
+               width = 0.6) +
+  labs(title = "Birth Weight by Mother's Smoking Habit",
+    x = "Smoking Habit",
+    y = "Birth Weight (lbs)"
+  ) +
+  theme_minimal()
+
+```
+
+The boxplots show that birth weights for babies of smoking mothers tend to be lower than those of non-smoking mothers. The median weight for smokers is visibly lower, although the spreads of the two groups are fairly similar and the distributions overlap considerably. Both groups show slight skewness and some potential outliers. While there appears to be a difference in center, formal statistical testing is needed to determine whether this difference is statistically significant.
 

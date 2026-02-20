@@ -139,6 +139,105 @@ ncbirths %>%
 
 ### Exercise 2
 
-…
+The mean weights of infants of White mothers in the sample is 7.25
+pound, which is less than the average.
 
-Add exercise headings as needed.
+``` r
+ncbirths_white <- ncbirths %>% 
+  filter(whitemom == "white")
+
+mean(ncbirths_white$weight)
+```
+
+    ## [1] 7.250462
+
+### Exercise 3
+
+The observations in the sample are independent of each other and the
+sample size is reasonably large (n = 1000), and the shape of the
+distribution. However, the shape of the distribution is slightly skewed
+to the left. Therefore, I don’t think the criteria necessary for
+conducting simulaiton-based inference are satisfied.
+
+``` r
+ncbirths_white %>% 
+  ggplot(
+    aes(x = weight)
+  ) +
+  geom_bar()
+```
+
+![](lab-12_files/figure-gfm/distribution-1.png)<!-- -->
+
+### Exercise 4
+
+``` r
+set.seed(123)
+
+boot.data <- ncbirths_white %>%
+  specify(response = weight) %>% 
+  generate(reps = 15000, type = "bootstrap") %>% 
+  calculate(stat = "mean")
+
+obs_mean <- mean(ncbirths_white$weight)
+
+boot_mean_center <- mean(boot.data$stat)
+
+null_dist <- boot.data %>%
+  mutate(null_stat = stat - boot_mean_center + 7.43)
+
+null_dist %>% 
+  ggplot(
+    aes(
+      x = null_stat)
+    ) +
+  geom_histogram(fill = "#9ecae1") +
+  labs(title = "Bootstrap distribution of means",
+       x = "Mean",
+       y = "") +
+  geom_vline(aes(
+    xintercept = obs_mean
+  ),
+    color = "#3182bd",
+    linetype = "dashed")
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value `binwidth`.
+
+![](lab-12_files/figure-gfm/bootstrap-1.png)<!-- -->
+
+``` r
+p_value <- null_dist %>%
+  summarise(p = mean(abs(null_stat - 7.43) >= 
+                     abs(obs_mean - 7.43))) %>%
+  pull(p)
+
+p_value
+```
+
+    ## [1] 0.0006666667
+
+The p-value is less than 0.001, which supports the alternative
+hypothesis that the baby weight in the sample is significantly lower
+than that of the population.
+
+### Exercise 5
+
+``` r
+ncbirths %>%
+  filter(!is.na(habit),
+         !is.na(weight)) %>%
+  ggplot(aes(
+    x = habit, 
+    y = weight)) +
+  geom_boxplot(fill = "#9ecae1",
+               alpha = 0.8,
+               width = 0.6) +
+  labs(title = "Birth Weight by Mother's Smoking Habit",
+    x = "Smoking Habit",
+    y = "Birth Weight (lbs)"
+  ) +
+  theme_minimal()
+```
+
+![](lab-12_files/figure-gfm/habit_weight-1.png)<!-- -->
