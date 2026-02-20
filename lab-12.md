@@ -1,7 +1,7 @@
 Lab 12 - Smoking during pregnancy
 ================
 Yiwei Tang
-2/19/2026
+2/20/2026
 
 ### Load packages and data
 
@@ -241,3 +241,97 @@ ncbirths %>%
 ```
 
 ![](lab-12_files/figure-gfm/habit_weight-1.png)<!-- -->
+
+The boxplots show that birth weights for babies of smoking mothers tend
+to be lower than those of non-smoking mothers. The median weight for
+smokers is visibly lower, although the spreads of the two groups are
+fairly similar and the distributions overlap considerably. Both groups
+show slight skewness and some potential outliers. While there appears to
+be a difference in center, formal statistical testing is needed to
+determine whether this difference is statistically significant.
+
+### Exercise 6
+
+``` r
+ncbirths_clean <- ncbirths %>%
+  filter(!is.na(habit), !is.na(weight))
+```
+
+It is important to remove rows with missing values in either habit or
+weight before calculating group summaries because missing values can
+distort results. Observations without a smoking status cannot be
+assigned to a group, and observations without a birth weight cannot
+contribute to the calculation of group means. Removing incomplete cases
+ensures that comparisons between groups are based only on valid and
+comparable data.
+
+### Exercise 7
+
+``` r
+ncbirths_clean %>%
+  group_by(habit) %>%
+  summarise(mean_weight = mean(weight))
+```
+
+    ## # A tibble: 2 × 2
+    ##   habit     mean_weight
+    ##   <fct>           <dbl>
+    ## 1 nonsmoker        7.14
+    ## 2 smoker           6.83
+
+``` r
+obs_diff <- ncbirths_clean %>%
+  group_by(habit) %>%
+  summarise(mean_weight = mean(weight)) %>%
+  summarise(diff = diff(mean_weight)) %>%
+  pull(diff)
+
+obs_diff
+```
+
+    ## [1] -0.3155425
+
+The observed difference in mean birth weight between babies born to
+non-smoking and smoking mothers is approximately 0.3 pounds. On average,
+babies of non-smoking mothers weigh more than those of smoking mothers.
+
+### EXercise 8
+
+Let $\mu_1$ represent the mean birth weight for babies born to
+non-smoking mothers, and $\mu_2$ represent the mean birth weight for
+babies born to smoking mothers.
+
+**Null Hypothesis:** There is no difference in birth weight between the
+two groups. $$
+H_0: \mu_1 - \mu_2 = 0
+$$
+
+**Alternative Hypothesis:** There is a difference in mean birth weight
+between the two groups. $$
+H_A: \mu_1 - \mu_2 \neq 0
+$$
+
+### Exercise 9
+
+``` r
+ttest <- t.test(weight ~ habit, data = ncbirths_clean, alternative = "two.sided")
+ttest
+```
+
+    ## 
+    ##  Welch Two Sample t-test
+    ## 
+    ## data:  weight by habit
+    ## t = 2.359, df = 171.32, p-value = 0.01945
+    ## alternative hypothesis: true difference in means between group nonsmoker and group smoker is not equal to 0
+    ## 95 percent confidence interval:
+    ##  0.05151165 0.57957328
+    ## sample estimates:
+    ## mean in group nonsmoker    mean in group smoker 
+    ##                7.144273                6.828730
+
+I am honestly very confused at this point. I am not sure what I should
+be doing for this exercise. And it has taken me way too long to get to
+this point. I think it might be a good place for me to stop and spend
+the time I have to think more about what bootstrapping is doing and how
+that’s different from inferential analysis.
