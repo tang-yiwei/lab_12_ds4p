@@ -91,6 +91,14 @@ ncbirths %>%
 
 ### Exercise 2
 
-...
+The mean weights of infants of White mothers in the sample is 7.25 pound, which is less than the average.
 
-Add exercise headings as needed.
+```{r}
+ncbirths_white <- ncbirths %>% 
+  filter(whitemom == "white")
+
+mean(ncbirths_white$weight)
+```
+
+### Exercise 3
+
